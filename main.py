@@ -37,9 +37,9 @@ section[data-testid="stSidebar"] {
     color: #C4271C;
     
     /* Impede redimensionamento da sidebar */
-    width: 180px !important;
-    min-width: 180px !important;
-    max-width: 180px !important;
+    width: 300px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
     overflow-x: hidden;
 }
 
@@ -90,7 +90,6 @@ for lote in data:
 df = pd.DataFrame(registros)
 
 
-# 🔍 Filtros globais
 # 🔍 Filtros globais
 st.sidebar.markdown("### Filtros")
 
@@ -178,7 +177,7 @@ if pagina == "Dashboard":
     # 1️⃣ Seriais por Grupo (Fechados)
     # st.header("Total de Seriais por PA (Lotes Fechados por Status)")
 
-    df_fechado = df[df["status_lote"].str.lower() == "fechado"].copy()
+    df_fechado = df_filtrado[df_filtrado["status_lote"].str.lower() == "fechado"].copy()
     df_fechado["status_lote"] = df_fechado["status_lote"].str.lower().str.replace(" ", "_")
     df_fechado["status_lote_label"] = df_fechado["status_lote"].map(status_label_map)
 
@@ -191,27 +190,23 @@ if pagina == "Dashboard":
                 color_discrete_map=legenda_cores)
     fig1.update_traces(textposition="inside", textfont_color="white")
     fig1.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
-    st.plotly_chart(fig1, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+    st.plotly_chart(fig1, use_container_width=False, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
 
     # 2️⃣ Seriais por Grupo e Status (Exceto Fechados)
     #st.header("Seriais por PA (Todos os Status Diferentes de Fechado)")
-    df_abertos = df[df["status_lote"].str.lower() != "fechado"].copy()
+    df_abertos = df_filtrado[df_filtrado["status_lote"].str.lower() != "fechado"].copy()
     df_abertos["status_lote"] = df_abertos["status_lote"].str.lower().str.replace(" ", "_")
-    df_grouped = df_abertos.groupby(["grupo", "status_lote"]).size().reset_index(name="quantidade")
-    df_grouped["status_lote_label"] = df_grouped["status_lote"].map(status_label_map)
+    df_abertos["status_lote_label"] = df_abertos["status_lote"].map(status_label_map)
+
+    df_grouped = df_abertos.groupby(["grupo", "status_lote_label"]).size().reset_index(name="quantidade")
 
     fig2 = px.bar(
         df_grouped,
         x="grupo",
         y="quantidade",
         color="status_lote_label",
-        color_discrete_map={
-            "Aberto": "#c70303",
-            "Aguardando Validação": "#5a000b",
-            "Em Andamento": "#C4271C",
-            "Pendente": "#ef9a9a"
-        },
+        color_discrete_map=legenda_cores,
         barmode="group",
         text_auto=True,
         labels={"grupo": "PA", "quantidade": "Qtd. de Seriais", "status_lote_label": "Status"},
@@ -219,47 +214,41 @@ if pagina == "Dashboard":
     )
     fig2.update_traces(textposition="inside", textfont_color="white")
     fig2.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
-    st.plotly_chart(fig2, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
-
-
- 
+    st.plotly_chart(fig2, use_container_width=False, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
     # 4️⃣ Lotes por Grupo e Status (Todos)
     # st.header("Lotes por PA (Todos os Status)")
-    df_unico = df[["grupo", "lote_id", "status_lote"]].drop_duplicates()
+    df_unico = df_filtrado[["grupo", "lote_id", "status_lote"]].drop_duplicates()
     df_unico["status_lote"] = df_unico["status_lote"].str.lower().str.replace(" ", "_")
     df_unico["status_lote_label"] = df_unico["status_lote"].map(status_label_map)
 
     df_grouped = df_unico.groupby(["grupo", "status_lote_label"]).size().reset_index(name="quantidade")
-    tons_vermelho = ["#c70303", "#5a000b", "#ad4646", "#C4271C", "#ef9a9a", "#f44336"]
-    legenda_cores = {status: tons_vermelho[i % len(tons_vermelho)] for i, status in enumerate(df_grouped["status_lote_label"].unique())}
 
     fig3 = px.bar(df_grouped, x="grupo", y="quantidade", color="status_lote_label",
-                  color_discrete_map=legenda_cores, barmode="group", text_auto=True,
-                  labels={"grupo": "PA", "quantidade": "Qtd. de Lotes", "status_lote_label": "Status"},
-                  title="Quantidade de Lotes por PA (Todos os Status)")
+                color_discrete_map=legenda_cores, barmode="group", text_auto=True,
+                labels={"grupo": "PA", "quantidade": "Qtd. de Lotes", "status_lote_label": "Status"},
+                title="Quantidade de Lotes por PA (Todos os Status)")
     fig3.update_traces(textposition="inside", textfont_color="white")
     fig3.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
-    st.plotly_chart(fig3, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+    st.plotly_chart(fig3, use_container_width=False, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
 
 
     # 5️⃣ NOVO: Seriais por Grupo (Todos os Status, incluindo Fechado)
     #st.header("Seriais por PA (Todos os Status)")
-    df_all = df.copy()
+    df_all = df_filtrado.copy()
     df_all["status_lote"] = df_all["status_lote"].str.lower().str.replace(" ", "_")
     df_all["status_lote_label"] = df_all["status_lote"].map(status_label_map)
 
     df_total = df_all.groupby(["grupo", "status_lote_label"]).size().reset_index(name="quantidade")
 
     fig4 = px.bar(df_total, x="grupo", y="quantidade", color="status_lote_label",
-                  color_discrete_map=legenda_cores, barmode="group", text_auto=True,
-                  labels={"grupo": "PA", "quantidade": "Qtd. de Seriais", "status_lote_label": "Status"},
-                  title="Quantidade Total de Seriais por PA (Todos os Status)")
+                color_discrete_map=legenda_cores, barmode="group", text_auto=True,
+                labels={"grupo": "PA", "quantidade": "Qtd. de Seriais", "status_lote_label": "Status"},
+                title="Quantidade Total de Seriais por PA (Todos os Status)")
     fig4.update_traces(textposition="inside", textfont_color="white")
     fig4.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
-    st.plotly_chart(fig4, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
-
+    st.plotly_chart(fig4, use_container_width=False, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
 # ======================
 # 📄 TABELA COMPLETA
