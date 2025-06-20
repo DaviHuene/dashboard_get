@@ -11,7 +11,7 @@ st.set_page_config(page_title="Painel Inventário", layout="wide")
 # 🎨 Tema customizado
 st.markdown("""
 <style>
-[data-testid="stAppViewContainer"] { background:#fceaea; }
+[data-testid="stAppViewContainer"] { background:#fffff; }
 [data-testid="stAppViewBlockContainer"] { background: transparent; }
 h1, h2, h3 { color: #7a2e2e; }
 thead tr th {
@@ -30,11 +30,20 @@ tbody tr td { color: #b74d4d !important; }
     background-color: #e53935;
 }
 
+
 section[data-testid="stSidebar"] {
     background: #fbe6e6;
-    border-right: 3px solid #C4271C;  
+    border-right: 4px solid #C4271C;
     color: #C4271C;
+    
+    /* Impede redimensionamento da sidebar */
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+    overflow-x: hidden;
 }
+
+
 header[data-testid="stHeader"] { display: none; }
 footer { visibility: hidden; }
 section[data-testid="stSidebar"] * {
@@ -127,15 +136,15 @@ if pagina == "Dashboard":
 
     st.markdown(f"""
     <div style="display:flex;gap:40px;margin-top:10px;margin-bottom:20px;flex-wrap:wrap;">
-        <div style="background:#fff3f3;padding:20px;border-radius:12px;border:1px solid #C4271C;min-width:200px;">
+        <div style="background:#fff3f3;padding:15px;border-radius:10px;border:1px solid #C4271C;min-width: 150px;">
             <h3 style="margin:0;color:#C4271C;">🔢 Total de Lotes</h3>
             <p style="font-size:22px;margin:5px 0;color:#C4271C;"><strong>{total_lotes}</strong></p>
         </div>
-        <div style="background:#fff3f3;padding:20px;border-radius:12px;border:1px solid #C4271C;min-width:200px;">
+        <div style="background:#fff3f3;padding:15px;border-radius:10px;border:1px solid #C4271C;min-width: 150px;">
             <h3 style="margin:0;color:#C4271C;">📦 Total de Seriais</h3>
             <p style="font-size:22px;margin:5px 0;color:#C4271C;"><strong>{total_seriais}</strong></p>
         </div>
-        <div style="background:#fff3f3;padding:20px;border-radius:12px;border:1px solid #C4271C;min-width:200px;">
+        <div style="background:#fff3f3;padding:15px;border-radius:10px;border:1px solid #C4271C;min-width: 150px;">
             <h3 style="margin:0;color:#C4271C;">🕒 Atualizado em</h3>
             <p style="font-size:18px;margin:5px 0;color:#C4271C;">{data_atualizacao}</p>
         </div>
@@ -181,8 +190,9 @@ if pagina == "Dashboard":
                 title="Total de Seriais por PA (Lotes Fechados por Status)",
                 color_discrete_map=legenda_cores)
     fig1.update_traces(textposition="inside", textfont_color="white")
-    fig1.update_layout(width=700, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
-    st.plotly_chart(fig1, config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+    fig1.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
+    st.plotly_chart(fig1, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+
 
     # 2️⃣ Seriais por Grupo e Status (Exceto Fechados)
     #st.header("Seriais por PA (Todos os Status Diferentes de Fechado)")
@@ -208,8 +218,9 @@ if pagina == "Dashboard":
         title="Quantidade de Seriais por PA (Status ≠ Fechado)"
     )
     fig2.update_traces(textposition="inside", textfont_color="white")
-    fig2.update_layout(xaxis_tickfont=dict(size=16), legend_title="Status", height=400)
-    st.plotly_chart(fig2, config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+    fig2.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
+    st.plotly_chart(fig2, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+
 
  
 
@@ -228,8 +239,10 @@ if pagina == "Dashboard":
                   labels={"grupo": "PA", "quantidade": "Qtd. de Lotes", "status_lote_label": "Status"},
                   title="Quantidade de Lotes por PA (Todos os Status)")
     fig3.update_traces(textposition="inside", textfont_color="white")
-    fig3.update_layout(xaxis_tickfont=dict(size=16), height=400)
-    st.plotly_chart(fig3, config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+    fig3.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
+    st.plotly_chart(fig3, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+
+
 
     # 5️⃣ NOVO: Seriais por Grupo (Todos os Status, incluindo Fechado)
     #st.header("Seriais por PA (Todos os Status)")
@@ -244,9 +257,10 @@ if pagina == "Dashboard":
                   labels={"grupo": "PA", "quantidade": "Qtd. de Seriais", "status_lote_label": "Status"},
                   title="Quantidade Total de Seriais por PA (Todos os Status)")
     fig4.update_traces(textposition="inside", textfont_color="white")
-    fig4.update_layout(xaxis_tickfont=dict(size=16), height=400)
-    st.plotly_chart(fig4, config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
- 
+    fig4.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
+    st.plotly_chart(fig4, use_container_width=False,config={ "displaylogo": False,"modeBarButtonsToRemove": ["toggleFullscreen"]})
+
+
 # ======================
 # 📄 TABELA COMPLETA
 # ======================
