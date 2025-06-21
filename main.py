@@ -36,21 +36,7 @@ section[data-testid="stSidebar"] {
     border-right: 4px solid #C4271C;
     color: #C4271C;
     
-    /* Impede redimensionamento da sidebar */
-    width: 300px !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    overflow-x: hidden;
-}
 
-
-header[data-testid="stHeader"] { display: none; }
-footer { visibility: hidden; }
-section[data-testid="stSidebar"] * {
-    
-    color: Black;
-    font-weight: bold;
-}
 
 
 </style>
@@ -120,7 +106,7 @@ filtro_status = st.sidebar.multiselect(
 df_filtrado = df[
     (df["grupo"].isin(filtro_grupo)) & 
     (df["status_lote"].isin(filtro_status))
-].copy()
+].copy()         
 
 
 # ======================
@@ -258,7 +244,7 @@ elif pagina == "Tabela Completa":
     st.title(" Tabela de Seriais Bipados")
 
     # Ocultar a primeira coluna
-    df_sem_primeira = df.iloc[:, 1:]
+    df_sem_primeira = df.iloc[:, 0:]
 
     # CSS para ocultar índice e scroll lateral
     st.markdown("""
