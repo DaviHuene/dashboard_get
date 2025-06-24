@@ -47,15 +47,15 @@ st.sidebar.title("Menu")
 pagina = st.sidebar.selectbox("Escolha a página", ["Dashboard", "Tabela Completa"])
     
 # 🔸 Dados da API
-API_URL = "http://192.168.0.214/inventario-api/api/v1/dash/"
+API_URL = "http://192.168.0.214/inventario-api/api/v1/dash"
 try:
     response = requests.get(API_URL, headers={"accept": "application/json"})
     response.raise_for_status()
     data = response.json()
 except Exception as e:
-    st.error(f"Erro ao consultar API: {e}")
-    st.stop()
-
+    st.error(f"⚠️ Nenhum dado foi carregado. A API pode estar fora do ar ou sem dados disponíveis.")
+    data = []
+    grupo = []
 # 🔸 Transformar em DataFrame
 registros = []
 for lote in data:
@@ -73,7 +73,12 @@ for lote in data:
                 "patrimonio": bipado["patrimonio"]
             })
 
-df = pd.DataFrame(registros)
+# Cria DataFrame com colunas definidas, mesmo se vazio
+colunas_esperadas = [
+    "lote_id", "status_lote", "grupo", "caixa_id", "nr_caixa", "identificador",
+    "unidade", "modelo", "patrimonio"
+]
+df = pd.DataFrame(registros, columns=colunas_esperadas)
 
 
 # 🔍 Filtros globais
