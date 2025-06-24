@@ -90,7 +90,7 @@ status = sorted(df["status_lote"].dropna().unique().tolist())
 
 # Checkboxes de "Selecionar todos"
 selecionar_todos_grupos = st.sidebar.checkbox("Selecionar todos os Grupos (PA)", value=True)
-selecionar_todos_status = st.sidebar.checkbox("Selecionar todos os Status de Lote", value=True)
+selecionar_todos_status = st.sidebar.checkbox("Selecionar todos os Status das Torres", value=True)
 
 # Multiselects com base nos checkboxes
 filtro_grupo = st.sidebar.multiselect(
@@ -101,7 +101,7 @@ filtro_grupo = st.sidebar.multiselect(
 )
 
 filtro_status = st.sidebar.multiselect(
-    "🔍 Filtrar por Status do Lote",
+    "🔍 Filtrar por Status das Torres",
     options=status,
     default=status if selecionar_todos_status else [],
     key="filtro_status"
@@ -120,15 +120,15 @@ df_filtrado = df[
 if pagina == "Dashboard":
     st.title("Painel Analítico de Seriais Bipados")
     
-    total_lotes = df_filtrado["lote_id"].nunique()
+    total_Torres = df_filtrado["lote_id"].nunique()
     total_seriais = df_filtrado.shape[0]
     data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     st.markdown(f"""
     <div style="display:flex;gap:40px;margin-top:10px;margin-bottom:20px;flex-wrap:wrap;">
         <div style="background:#fff3f3;padding:15px;border-radius:10px;border:1px solid #C4271C;min-width: 150px;">
-            <h3 style="margin:0;color:#C4271C;">🔢 Total de Lotes</h3>
-            <p style="font-size:22px;margin:5px 0;color:#C4271C;"><strong>{total_lotes}</strong></p>
+            <h3 style="margin:0;color:#C4271C;">🔢 Total de Torres</h3>
+            <p style="font-size:22px;margin:5px 0;color:#C4271C;"><strong>{total_Torres}</strong></p>
         </div>
         <div style="background:#fff3f3;padding:15px;border-radius:10px;border:1px solid #C4271C;min-width: 150px;">
             <h3 style="margin:0;color:#C4271C;">📦 Total de Seriais</h3>
@@ -166,7 +166,7 @@ if pagina == "Dashboard":
     
 
     # 1️⃣ Seriais por Grupo (Fechados)
-    # st.header("Total de Seriais por PA (Lotes Fechados por Status)")
+    # st.header("Total de Seriais por PA (Torres Fechados por Status)")
 
     df_fechado = df_filtrado[df_filtrado["status_lote"].str.lower() == "fechado"].copy()
     df_fechado["status_lote"] = df_fechado["status_lote"].str.lower().str.replace(" ", "_")
@@ -177,7 +177,7 @@ if pagina == "Dashboard":
     fig1 = px.bar(df_seriais_status, x="grupo", y="total_seriais", color="status_lote_label",
                 barmode="group", text_auto=True,
                 labels={"grupo": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status"},
-                title="Total de Seriais por PA (Lotes Fechados por Status)",
+                title="Total de Seriais por PA (Torres Fechados por Status)",
                 color_discrete_map=legenda_cores)
     fig1.update_traces(textposition="inside", textfont_color="white")
     fig1.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
@@ -207,8 +207,8 @@ if pagina == "Dashboard":
     fig2.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
     st.plotly_chart(fig2, use_container_width=False, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
-    # 4️⃣ Lotes por Grupo e Status (Todos)
-    # st.header("Lotes por PA (Todos os Status)")
+    # 4️⃣ Torres por Grupo e Status (Todos)
+    # st.header("Torres por PA (Todos os Status)")
     df_unico = df_filtrado[["grupo", "lote_id", "status_lote"]].drop_duplicates()
     df_unico["status_lote"] = df_unico["status_lote"].str.lower().str.replace(" ", "_")
     df_unico["status_lote_label"] = df_unico["status_lote"].map(status_label_map)
@@ -217,8 +217,8 @@ if pagina == "Dashboard":
 
     fig3 = px.bar(df_grouped, x="grupo", y="quantidade", color="status_lote_label",
                 color_discrete_map=legenda_cores, barmode="group", text_auto=True,
-                labels={"grupo": "PA", "quantidade": "Qtd. de Lotes", "status_lote_label": "Status"},
-                title="Quantidade de Lotes por PA (Todos os Status)")
+                labels={"grupo": "PA", "quantidade": "Qtd. de Torres", "status_lote_label": "Status"},
+                title="Quantidade de Torres por PA (Todos os Status)")
     fig3.update_traces(textposition="inside", textfont_color="white")
     fig3.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=16), legend_title="Status")
     st.plotly_chart(fig3, use_container_width=False, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
