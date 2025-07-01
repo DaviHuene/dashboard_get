@@ -1,6 +1,4 @@
 [theme]
 
-backgroundColor = "#ffff"           # fundo da página
-
-
-
+backgroundColor="#f5f5f5"        # Fundo do app
+font="sans serif"                # Fonte padrão
