@@ -230,7 +230,7 @@ if pagina == "Dashboard":
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{total_torres}</strong></p>
         </div>
          <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
-            <h3 style="margin:0;color:{cor_texto_menu};">📦 Caixas Únicas</h3>
+            <h3 style="margin:0;color:{cor_texto_menu};">📦 Total de Lotes</h3>
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{total_caixas}</strong></p>
         </div>
           <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
