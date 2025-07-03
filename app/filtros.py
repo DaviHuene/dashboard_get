@@ -1,34 +1,71 @@
-# app/filtros.py
 import streamlit as st
 import pandas as pd
-from app.api import carregar_dados_api
+
+import streamlit as st
+import pandas as pd
 
 def aplicar_filtros(data):
     registros = []
-    for lote in data:
-        status_lote = lote.get("status", "").strip().lower()
-        for caixa in lote.get("caixas", []):
-            for bipado in caixa.get("bipagem", []):
-                registros.append({
-                    "lote_id": lote["id"],
-                    "status_lote": status_lote,
-                    "username": lote["username"],
-                    "group_user": lote.get("group_user", ""),
-                    "caixa_id": caixa["id"],
-                    "nr_caixa": caixa["nr_caixa"],
-                    "identificador": caixa["identificador"],
-                    "unidade": bipado["unidade"],
-                    "modelo": bipado["modelo"],
-                    "nrserie": bipado["nrserie"]
-                })
 
+    for lote in data:
+        try:
+            if not lote.get("caixas"):
+                registros.append({
+                    "lote_id": lote.get("id"),
+                    "status_lote": lote.get("status", "").strip().lower(),
+                    "username": lote.get("username", ""),
+                    "group_user": lote.get("group_user", ""),
+                    "caixa_id": None,
+                    "nr_caixa": None,
+                    "identificador": None,
+                    "unidade": None,
+                    "modelo": None,
+                    "nrserie": None
+                })
+            else:
+                for caixa in lote.get("caixas", []):
+                    try:
+                        if not caixa.get("bipagem"):
+                            registros.append({
+                                "lote_id": lote.get("id"),
+                                "status_lote": lote.get("status", "").strip().lower(),
+                                "username": lote.get("username", ""),
+                                "group_user": lote.get("group_user", ""),
+                                "caixa_id": caixa.get("id"),
+                                "nr_caixa": caixa.get("nr_caixa"),
+                                "identificador": caixa.get("identificador"),
+                                "unidade": None,
+                                "modelo": None,
+                                "nrserie": None
+                            })
+                        else:
+                            for bipado in caixa.get("bipagem", []):
+                                registros.append({
+                                    "lote_id": lote.get("id"),
+                                    "status_lote": lote.get("status", "").strip().lower(),
+                                    "username": lote.get("username", ""),
+                                    "group_user": lote.get("group_user", ""),
+                                    "caixa_id": caixa.get("id"),
+                                    "nr_caixa": caixa.get("nr_caixa"),
+                                    "identificador": caixa.get("identificador"),
+                                    "unidade": bipado.get("unidade"),
+                                    "modelo": bipado.get("modelo"),
+                                    "nrserie": bipado.get("nrserie")
+                                })
+                    except:
+                        pass
+        except:
+            pass
 
     df = pd.DataFrame(registros)
 
     if df.empty:
-        return df, df
+        st.warning("⚠️ Nenhum dado disponível no momento. Os gráficos aparecerão vazios.")
+    elif df["status_lote"].str.lower().eq("aberto").sum() == 0:
+        st.warning("⚠️ Nenhum lote com status 'aberto' encontrado.")
 
-    return df, criar_menu_filtros(df)
+    return df
+
 
 
 def criar_menu_filtros(df):

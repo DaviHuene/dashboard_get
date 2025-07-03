@@ -11,8 +11,11 @@ st.set_page_config(page_title="Painel Inventário", layout="wide")
 
 
 
-st.sidebar.title("Menu")
-modo = st.sidebar.radio("🌗 Tema", ["Claro", "Escuro"], horizontal=True)
+
+
+
+modo = st.radio("🌗 Tema",  ["Claro", "Escuro"], horizontal=True)
+
 
 if modo == "Claro":
     cor_menu = "#fcdddd"
@@ -26,6 +29,7 @@ else:
     cor_fundo = "#121212"
     cor_primaria = "#c70101"
     cor_input="#202020"
+
 st.markdown(f"""
     <style>
     [data-testid="stAppViewContainer"] {{
@@ -51,11 +55,11 @@ st.markdown(f"""
         border-radius: 10px !important;
         background-color: {cor_input} !important;
     }}
-    div[data-baseweb="select"] span {{ 
+    div[data-baseweb="select"] span {{
         color: {cor_menu} !important;
         font-weight: bold;
     }}
-   
+    
     .stButton > button {{
         background-color: {cor_primaria};
         color: white;
@@ -66,13 +70,33 @@ st.markdown(f"""
     .stMultiSelect,.stDateInput {{
         color: {cor_primaria} !important;
     }}
- 
+ /* Container do radio */
+[data-testid="stRadio"] {{
+    display: flex;
+    justify-content:first baseline
+    padding: 10px;
+    margin-bottom: 40px;
+    background-color:  {cor_menu} ;
+    border-radius: 12px;
+    border: 2px solid {cor_primaria}
+   
+}}
 
 
+    .selectbox[data-baseweb="menu"] .selectbox[role="option"]:hover {{
+   color: {cor_primaria} !important;
+    background-color: {cor_input} !important;
+        }}
+    .selectbox{{
+       color: {cor_primaria} !important;
+    background-color: {cor_input} !important;
+    }}
+    .stTabs [role="tab"] {{
+        color: {cor_input} !important;
+        background-color: {cor_input} !important;
+    }}
     </style>
 """, unsafe_allow_html=True)
-
-pagina = st.sidebar.selectbox("Escolha a página", ["Dashboard", "Tabela Completa"])
 
 API_URL = "http://192.168.0.214/inventario-api/api/v1/dash"
 try:
@@ -144,7 +168,7 @@ for lote in data:
                                     "nrserie": bipado.get("nrserie"),
                                     "estado": bipado.get ("estado"),
                                     "observacao":bipado.get ("observacao"),
-                                    "acao":bipado.get ("acao")
+                                    "acao":None
                                 })
                             except:
                                 pass
@@ -164,56 +188,27 @@ if not tem_aberto:
         "identificador", "unidade", "modelo","estado","acao", "observacao"
 ])
 
+else:
+    tem_aberto = False
+
    
-st.sidebar.markdown("### Filtros")
+
 
 # Filtros de Torre e Status e PA
 pa = sorted(df["group_user"].dropna().unique().tolist())
 torres = sorted(df["username"].dropna().unique().tolist())
 status = sorted(df["status_lote"].dropna().unique().tolist())
-estado = sorted(df["estado"].dropna().unique().tolist())
-acao= sorted(df["acao"].dropna().unique().tolist())
-
-selecionar_todas_torres = st.sidebar.checkbox("Selecionar todas as Torres", value=True)
-selecionar_todos_status = st.sidebar.checkbox("Selecionar todos os Status", value=True)
-selecionar_todas_PA = st.sidebar.checkbox("Selecionar todas as PAs", value=True)
-selecionar_todos_estado = st.sidebar.checkbox("Selecionar todos os Status_1", value=True)
-selecionar_todas_acao = st.sidebar.checkbox("Selecionar todos os Status_2", value=True)
-
-filtro_PA =st.sidebar.multiselect(
-    "🔍 Filtrar por PA", options=pa,
-    default=pa if selecionar_todas_PA else []
-)
-filtro_torres = st.sidebar.multiselect(
-    "🔍 Filtrar por Torre", options=torres,
-    default=torres if selecionar_todas_torres else []
-)
-filtro_status = st.sidebar.multiselect(
-    "🔍 Filtrar por Status", options=status,
-    default=status if selecionar_todos_status else []
-)
-filtro_estado = st.sidebar.multiselect(
-    "🔍 Filtrar por Status_1", options=estado,
-    default=estado if selecionar_todos_estado else []
-)
-filtro_acao= st.sidebar.multiselect(
-     "🔍 Filtrar por Status_2", options=acao,
-   default=acao if selecionar_todas_acao else []
-)
-
-
 
 # Aplicar todos os filtros, incluindo PA
+# Filtragem automática: remover registros com campos vazios críticos
 df_filtrado = df[
-    (df["group_user"].isin(filtro_PA))&
-    (df["username"].isin(filtro_torres))&
-    (df["status_lote"].isin(filtro_status))&
-    (df["estado"].isin(filtro_estado))&
-    (df["acao"].isin(filtro_acao)) 
+    df["group_user"].notna() &
+    df["username"].notna() &
+    df["status_lote"].notna()
 ].copy()
-#
 
-if pagina == "Dashboard":
+
+if  "Dashboard":
     data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
     st.markdown(f"""
            <div style="background:{cor_fundo};">
@@ -226,13 +221,21 @@ if pagina == "Dashboard":
     df_lotes["status_lote"] = df_lotes["status_lote"].str.strip().str.lower()
 
     # Contagens
-   
+    config = {
+    "displaylogo": False,
+    "modeBarButtonsToRemove": [
+        "zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d",
+        "hoverClosestCartesian", "hoverCompareCartesian", "toggleSpikelines", "sendDataToCloud", "toggleHover"
+    ]
+}
+
+ 
 # Agora suas contagens e percentuais devem usar o df_filtrado 👇
     fechados = df_filtrado[df_filtrado["status_lote"] == "fechado"].shape[0]
     invalidado = df_filtrado[df_filtrado["status_lote"] == "invalidado"].shape[0]
     aberto = df_filtrado[df_filtrado["status_lote"] == "aberto"].shape[0]
     total_lotes = df_filtrado.shape[0]
-    
+
     percentual_fechados = round((fechados / total_lotes) * 100, 2) if total_lotes else 0
     percentual_invalidado = round((invalidado / total_lotes) * 100, 2) if total_lotes else 0
     percentual_aberto = round((aberto / total_lotes) * 100, 2) if total_lotes else 0
@@ -245,28 +248,28 @@ if pagina == "Dashboard":
     total_caixas = df_filtrado["caixa_id"].nunique()
 
     st.markdown(f"""
-    <div style="display:flex;gap:40px;margin-top:10px;margin-bottom:20px;flex-wrap:wrap;">
-        <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
+    <div style="display:flex;gap:60px;margin-top:10px;margin-bottom:20px;flex-wrap:wrap;">
+        <div style="background:{cor_fundo};padding:30px;border-radius:10px;border:1px solid {cor_primaria};">
             <h3 style="margin:0;color:{cor_texto_menu};">🏢 Total de Torres</h3>
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{total_torres}</strong></p>
         </div>
-         <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
+         <div style="background:{cor_fundo};padding:30px;border-radius:10px;border:1px solid {cor_primaria};">
             <h3 style="margin:0;color:{cor_texto_menu};">📦 Total de Lotes</h3>
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{total_caixas}</strong></p>
         </div>
-          <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
+          <div style="background:{cor_fundo};padding:30px;border-radius:10px;border:1px solid {cor_primaria};">
              <h3 style="margin:0;color:{cor_texto_menu};">📦 Total de Seriais</h3>
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{total_seriais}</strong></p>
         </div>
-          <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
+          <div style="background:{cor_fundo};padding:30px;border-radius:10px;border:1px solid {cor_primaria};">
             <h3 style="margin:0;color:{cor_texto_menu};">📈 Lotes Fechados</h3>
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{percentual_fechados}%</strong></p>
         </div>
-             <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
+             <div style="background:{cor_fundo};padding:30px;border-radius:10px;border:1px solid {cor_primaria};">
         <h3 style="margin:0;color:{cor_texto_menu};">🟡 Lotes Abertos</h3>
         <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{percentual_aberto}%</strong></p>
     </div>
-         <div style="background:{cor_fundo};padding:15px;border-radius:10px;border:1px solid {cor_primaria};">
+         <div style="background:{cor_fundo};padding:30px;border-radius:10px;border:1px solid {cor_primaria};">
             <h3 style="margin:0;color:{cor_texto_menu};">❌ Lotes Invalidados</h3>
             <p style="font-size:22px;margin:5px 0;color:{cor_texto_menu};"><strong>{percentual_invalidado}%</strong></p>
             </div>
@@ -333,9 +336,8 @@ if pagina == "Dashboard":
     df_percentual = pd.merge(df_agrupado, df_totais, on="torre_pa")
     df_percentual["percentual"] = round((df_percentual["quantidade"] / df_percentual["total_lotes"]) * 100, 2)
     df_percentual["status_lote"] = df_percentual["status_lote"].str.capitalize()
-
-        # ✅ Formatar percentual com símbolo %
     df_percentual["percentual"] = df_percentual["percentual"].astype(str) + "%"
+        
     fig = px.bar(
         df_percentual,
         x="torre_pa",
@@ -364,11 +366,16 @@ if pagina == "Dashboard":
     )
 
     fig.update_traces(textposition="inside", textfont_size=18)
-
+    fig.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
     # ▶️ Exibir no Streamlit
     st.plotly_chart(fig, use_container_width=True, config={
         "displaylogo": False,
-        "modeBarButtonsToRemove": ["toggleFullscreen"]
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
     })
 
         # 📦 Garantir colunas necessárias
@@ -418,9 +425,21 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-        fig1.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-        st.plotly_chart(fig1, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+        fig1.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
 
+        fig1.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
+        st.plotly_chart(fig1, use_container_width=False,config={
+        "displaylogo": False,
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
+    })
+
+
+ 
     # Paleta em tons de vermelho para os estados
     custom_colors = {
         "good": "#C40606",
@@ -511,8 +530,17 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-
-    st.plotly_chart(fig2, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+   
+    fig2.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
+    st.plotly_chart(fig2, use_container_width=False,config={
+        "displaylogo": False,
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
+    })
 
     # Gráfico 3 - Seriais por Torre (Fechados)
     df_fechado = df_filtrado[df_filtrado["status_lote"].str.lower() == "fechado"].copy()
@@ -539,7 +567,13 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-
+    fig3.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
+  
     st.plotly_chart(fig3, use_container_width=False)
     
     # 1. Mapeamento de status (legível)
@@ -553,7 +587,7 @@ if pagina == "Dashboard":
     df_filtrado["status_lote_label"] = df_filtrado["status_lote"].map(mapa_status)
     df_grouped = df_filtrado.groupby(["group_user", "username", "status_lote_label"]).size().reset_index(name="quantidade")
 
-
+    
     # 3. Criar coluna combinada PA-Torre para eixo X
     df_grouped["PA_Torre"] = df_grouped["group_user"] + " - " + df_grouped["username"]
 
@@ -595,8 +629,17 @@ if pagina == "Dashboard":
             gridcolor="#444" if modo == "Escuro" else "#ccc"
         )
     )
-
-    st.plotly_chart(fig4, use_container_width=True, config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+    fig4.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
+  
+    st.plotly_chart(fig4, use_container_width=True, config={
+        "displaylogo": False,
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
+    })
 
 
     # Gráfico 5 - Invalidado
@@ -616,8 +659,17 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-
-    st.plotly_chart(fig_Invalidado, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+    fig_Invalidado.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
+  
+    st.plotly_chart(fig_Invalidado, use_container_width=False,config={
+        "displaylogo": False,
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
+    })
 
     # Gráfico de Pizza
     col_p1, col_p2 = st.columns(2)
@@ -664,7 +716,17 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-        st.plotly_chart(fig_pizza, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+        fig_pizza.update_layout(
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)
+   
+        st.plotly_chart(fig_pizza, use_container_width=False,config={
+        "displaylogo": False,
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
+    })
         
     with col_p2:
         fig_pizza2 = px.sunburst(
@@ -690,90 +752,19 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )   
-        fig_pizza2.update_traces(marker=dict(colors=tons_vermelho))  # força o uso do seu mapa
-        st.plotly_chart(fig_pizza2, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
-
-elif pagina == "Tabela Completa":
-    # CSS para ocultar índice e scroll lateral
-    df_sem_primeira = df.iloc[:, 0:]
-    # Garante nomes amigáveis na tabela
-
-    # ✅ Prepara os dados (renomeia colunas e remove 'patrimonio')
-    df_tabela = df_filtrado.rename(columns={
-    "username": "Torre",
-    "group_user": "PA",
-    "nrserie": "Nr Série",
-    "estado": "Status_1",
-    "acao":"Status_2"
-    }).drop(columns=["patrimonio"], errors="ignore")
-
-
-    cor_botao = "#000000" if modo == "Escuro" else cor_primaria
-    cor_texto_botao = "#000000" if modo == "Escuro" else "#ffffff"
-
-    st.markdown(f"""
-    <style>
-    .stDownloadButton > button {{
-        background-color: { cor_texto_botao} !important;
-        color: {cor_texto_botao} !important;
-        border: 1px solid { cor_texto_botao};
-        border-radius: 6px;
-        font-weight: bold;
-        padding: 0.5rem 1rem;
-    }}
-    .stDownloadButton > button:hover {{
-        background-color: { cor_texto_botao} !important;
-        color: white !important;
-    }}
-    
-    
-    /* Tabela geral */
-    div[data-testid="stDataFrame"] div[role="grid"] {{
-        background-color: {cor_texto_botao} !important;
-        color: {cor_texto_botao} !important;
-        border-radius: 10px;
        
-    }}
-
-    /* Cabeçalho */
-    div[data-testid="stDataFrame"] thead th {{
-        background-color: {cor_texto_botao} !important;
-        color: {cor_texto_botao} !important;
-        font-weight: bold;
-        border-bottom: 1px solid #999;
-    }}
-
-    /* Células */
-    div[data-testid="stDataFrame"] tbody td {{
-        background-color: {cor_texto_botao} !important;
-        color: {cor_texto_botao} !important;
-    }}
-
-    /* Scroll invisível */
-    div[data-testid="stDataFrameScrollable"] > div:nth-child(1) {{
-        overflow-x: hidden;
-    }}
-    </style>
-""", unsafe_allow_html=True)
-
-
-    # ✅ Exibe a tabela
-    st.title("Tabela de Seriais Bipados")
-    st.dataframe(df_tabela, use_container_width=True, height=550, hide_index=True)
-    
-    # ✅ Botão para exportar CSV sem 'patrimonio'
-    def to_csv(dataframe):
-        output = StringIO()
-        dataframe.to_csv(output, index=False, sep=";")
-        return output.getvalue().encode("utf-8")
-
-    csv_bytes = to_csv(df_tabela)
-    st.download_button(
-        label="📥 Baixar CSV",
-        data=csv_bytes,
-        file_name="seriais_bipados.csv",
-        mime="text/csv"
-    )
+        fig_pizza2.update_traces(marker=dict(colors=tons_vermelho),  hoverinfo='label+value+percent entry',
+    insidetextorientation='radial')
+        fig_pizza2.update_layout(uirevision='static',
+    dragmode=False,                     # desativa pan/zoom via mouse
+    xaxis_fixedrange=True,             # desativa zoom eixo X
+   yaxis_fixedrange=True   ,legend_itemclick=False,
+    legend_itemdoubleclick=False          # desativa zoom eixo Y
+)# força o uso do seu mapa
+        st.plotly_chart(fig_pizza2, use_container_width=False,config={
+        "displaylogo": False,
+        "modeBarButtonsToRemove": ["toggleFullscreen"],"displayModeBar": False
+    })
 
 else:
     st.warning("⚠️ Coluna 'status' não encontrada para o gráfico de Status por Torre.")
