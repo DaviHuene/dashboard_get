@@ -487,6 +487,72 @@ if pagina == "Dashboard":
         use_container_width=True,
         config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]}
     )
+ # Paleta em tons de vermelho para os estados
+    custom_colors = {
+        "fif": "#C40606",
+        "f": "#8B163D",
+        "fifo": "#94180A",
+        "fff": "#FF2A13"
+    }
+
+    # 1. Garantir que a coluna 'estado' está em minúsculo
+    df_filtrado["acao"] = df_filtrado["acao"].str.lower()
+
+    # 2. Agrupar por group_user, username e estado
+    df_acao = df_filtrado.groupby(["group_user", "username", "acao"]).size().reset_index(name="quantidade")
+
+    # 3. Criar coluna combinada PA_Torre
+    df_acao["torre_pa"] = df_acao["group_user"] + " - " + df_acao["username"]
+
+    # 4. Pivotar os dados (linhas em colunas por estado)
+    df_pivot = df_acao.pivot_table(
+        index="torre_pa",
+        columns="acao",
+        values="quantidade",
+        fill_value=0
+    ).reset_index()
+
+    # 5. Gerar gráfico com Plotly
+    fig_acao= px.bar(
+        df_pivot,
+        x="torre_pa",
+        y=[col for col in df_pivot.columns if col != "torre_pa"],
+        title="Total de Seriais por Status-2 ",
+        labels={"value": "Quantidade", "variable": "acao"}, text_auto=True  ,#
+        barmode="group"
+    )
+
+    #  Aplicar tons de vermelho manualmente por trace
+    for trace in fig_acao.data:
+        acao_nome = trace.name.lower()
+    if acao_nome in custom_colors:
+            trace.marker.color = custom_colors[acao_nome]
+
+    # Layout visual
+    fig_acao.update_layout(
+         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
+        paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
+        font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
+        legend=dict(font=dict(color=cor_texto_menu)),  # legenda
+        xaxis=dict(
+            color=cor_texto_menu,
+            showgrid=False,
+            zeroline=False
+        ),
+        yaxis=dict(
+            color=cor_texto_menu,
+            showgrid=True,
+            gridcolor="#444" if modo == "Escuro" else "#ccc",
+            zeroline=False
+        )
+    )
+    fig_acao.update_traces(textposition='inside', textfont_color='white', textfont_size=18)
+   
+    st.plotly_chart(
+        fig_acao,
+        use_container_width=True,
+        config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]}
+    )
 
     # Gráfico 2 - Torres Abertas/Pendentes
     df_abertos = df_filtrado[df_filtrado["status_lote"] != "fechado"]
