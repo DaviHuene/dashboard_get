@@ -6,6 +6,7 @@ from io import StringIO
 from datetime import datetime
 import plotly.graph_objects as go
 import time
+import logging
 st.set_page_config(page_title="Painel Inventário", layout="wide")
 # === MODO LIGHT / DARK COM MUDANÇA NO MENU E GRÁFICOS ===
 
@@ -99,18 +100,31 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 API_URL = "http://192.168.0.214/inventario-api/api/v1/dash"
+import logging
+
 try:
     response = requests.get(API_URL, headers={"accept": "application/json"})
     response.raise_for_status()
     data = response.json()
 
-    # 🔍 Verifica se existe pelo menos um 'status_lote' nos lotes
+    # 🔍 Verifica se existe pelo menos um 'status' nos lotes
     if not any("status" in lote for lote in data):
-        st.error("⚠️ Nenhum lote  encontrado.")
+        st.error("⚠️ Nenhum lote encontrado.")
         st.stop()
 
-except Exception:
-    st.error("⚠️ Nenhum dado foi carregado. A API pode estar fora do ar ou sem dados disponíveis.")
+except requests.exceptions.RequestException as e:
+    logging.exception("Erro de requisição à API")
+    st.error("❌ Erro de conexão com a API.")
+    st.stop()
+
+except ValueError as e:
+    logging.exception("Erro ao interpretar JSON")
+    st.error("❌ Erro ao processar os dados retornados pela API.")
+    st.stop()
+
+except Exception as e:
+    logging.exception("Erro inesperado")
+    st.error("⚠️ Nenhum dado foi carregado.")
     st.stop()
 
 registros = []
@@ -168,7 +182,7 @@ for lote in data:
                                     "nrserie": bipado.get("nrserie"),
                                     "estado": bipado.get ("estado"),
                                     "observacao":bipado.get ("observacao"),
-                                    "acao":None
+                                    "acao":bipado.get ("acao")
                                 })
                             except:
                                 pass
@@ -509,12 +523,9 @@ if  "Dashboard":
 
 
 
-
-    custom_colors = {
-        "fif": "#C40606",
-        "f": "#8B163D",
-        "fifo": "#94180A",
-        "fff": "#FF2A13"
+  
+    custom_colors1 = {
+      "fifo": "#94180A",  
     }
 
     # 1. Garantir que a coluna 'estado' está em minúsculo
@@ -540,15 +551,14 @@ if  "Dashboard":
         x="torre_pa",
         y=[col for col in df_pivot.columns if col != "torre_pa"],
         title="Total de Seriais por Status-2 ",
-        labels={"value": "Quantidade", "variable": "acao"}, text_auto=True  ,#
+        labels={"value": "Quantidade", "variable": "acao" }, text_auto=True  ,#
         barmode="group"
     )
 
     #  Aplicar tons de vermelho manualmente por trace
+   # Apenas mantém os dados do gráfico padrão do Plotly
     for trace in fig_acao.data:
-        acao_nome = trace.name.lower()
-    if acao_nome in custom_colors:
-            trace.marker.color = custom_colors[acao_nome]
+        pass  # Nenhuma personalização de cor
 
     # Layout visual
     fig_acao.update_layout(
@@ -579,7 +589,7 @@ if  "Dashboard":
     df_abertos = df_filtrado[df_filtrado["status_lote"] != "fechado"]
     df2 = df_abertos.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig2 = px.bar(df2, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
-                title="Torres diferente de fechado por PA", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
+                title="Torres diferente de fechado por PA", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"  })
     fig2.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
     fig2.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico

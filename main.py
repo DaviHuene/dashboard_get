@@ -452,7 +452,7 @@ if pagina == "Dashboard":
         x="torre_pa",
         y=[col for col in df_pivot.columns if col != "torre_pa"],
         title="Total de Seriais por Status-1 ",
-        labels={"value": "Quantidade", "variable": "Estado"}, text_auto=True  ,#
+        labels={"value": "Quantidade", "variable": "Status-1"}, text_auto=True  ,#
         barmode="group"
     )
 
@@ -488,17 +488,17 @@ if pagina == "Dashboard":
         config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]}
     )
  # Paleta em tons de vermelho para os estados
-    custom_colors = {
-        "fif": "#C40606",
-        "f": "#8B163D",
-        "fifo": "#94180A",
-        "fff": "#FF2A13"
-    }
+    custom_colors1 = {
+    "fif": "#C40606",
+    "f": "#8B163D",
+    "fifo": "#94180A",
+    "fff": "#FF2A13"
+}
 
-    # 1. Garantir que a coluna 'estado' está em minúsculo
+    # 1. Garantir que a coluna 'acao' está em minúsculo
     df_filtrado["acao"] = df_filtrado["acao"].str.lower()
 
-    # 2. Agrupar por group_user, username e estado
+    # 2. Agrupar por group_user, username e acao
     df_acao = df_filtrado.groupby(["group_user", "username", "acao"]).size().reset_index(name="quantidade")
 
     # 3. Criar coluna combinada PA_Torre
@@ -513,27 +513,28 @@ if pagina == "Dashboard":
     ).reset_index()
 
     # 5. Gerar gráfico com Plotly
-    fig_acao= px.bar(
+    fig_acao = px.bar(
         df_pivot,
         x="torre_pa",
         y=[col for col in df_pivot.columns if col != "torre_pa"],
-        title="Total de Seriais por Status-2 ",
-        labels={"value": "Quantidade", "variable": "acao"}, text_auto=True  ,#
+        title="Total de Seriais por Status-2",
+        labels={"value": "Quantidade", "variable": "Status-2"},  # <- Aqui alterado
+        text_auto=True,
         barmode="group"
     )
 
-    #  Aplicar tons de vermelho manualmente por trace
+    # 6. Aplicar cores personalizadas por trace
     for trace in fig_acao.data:
         acao_nome = trace.name.lower()
-    if acao_nome in custom_colors:
-            trace.marker.color = custom_colors[acao_nome]
+        if acao_nome in custom_colors1:
+            trace.marker.color = custom_colors1[acao_nome]
 
-    # Layout visual
+    # 7. Layout visual
     fig_acao.update_layout(
-         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
-        paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
-        font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
-        legend=dict(font=dict(color=cor_texto_menu)),  # legenda
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color=cor_texto_menu),
+        legend=dict(font=dict(color=cor_texto_menu)),
         xaxis=dict(
             color=cor_texto_menu,
             showgrid=False,
@@ -546,13 +547,20 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-    fig_acao.update_traces(textposition='inside', textfont_color='white', textfont_size=18)
-   
+
+    fig_acao.update_traces(
+        textposition='inside',
+        textfont_color='white',
+        textfont_size=18
+    )
+
+    # 8. Exibir no Streamlit
     st.plotly_chart(
         fig_acao,
         use_container_width=True,
         config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]}
     )
+
 
     # Gráfico 2 - Torres Abertas/Pendentes
     df_abertos = df_filtrado[df_filtrado["status_lote"] != "fechado"]
