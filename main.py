@@ -177,8 +177,8 @@ acao= sorted(df["acao"].dropna().unique().tolist())
 selecionar_todas_torres = st.sidebar.checkbox("Selecionar todas as Torres", value=True)
 selecionar_todos_status = st.sidebar.checkbox("Selecionar todos os Status", value=True)
 selecionar_todas_PA = st.sidebar.checkbox("Selecionar todas as PAs", value=True)
-selecionar_todos_estado = st.sidebar.checkbox("Selecionar todos os Status_1", value=True)
-selecionar_todas_acao = st.sidebar.checkbox("Selecionar todos os Status_2", value=True)
+selecionar_todos_estado = st.sidebar.checkbox("Selecionar todos os Status-1", value=True)
+selecionar_todas_acao = st.sidebar.checkbox("Selecionar todos os Status-2", value=True)
 
 filtro_PA =st.sidebar.multiselect(
     "🔍 Filtrar por PA", options=pa,
@@ -193,11 +193,11 @@ filtro_status = st.sidebar.multiselect(
     default=status if selecionar_todos_status else []
 )
 filtro_estado = st.sidebar.multiselect(
-    "🔍 Filtrar por Status_1", options=estado,
+    "🔍 Filtrar por Status-1", options=estado,
     default=estado if selecionar_todos_estado else []
 )
 filtro_acao= st.sidebar.multiselect(
-     "🔍 Filtrar por Status_2", options=acao,
+     "🔍 Filtrar por Status-2", options=acao,
    default=acao if selecionar_todas_acao else []
 )
 
@@ -451,7 +451,7 @@ if pagina == "Dashboard":
         df_pivot,
         x="torre_pa",
         y=[col for col in df_pivot.columns if col != "torre_pa"],
-        title="Total de Seriais por Estado ",
+        title="Total de Seriais por Status-1 ",
         labels={"value": "Quantidade", "variable": "Estado"}, text_auto=True  ,#
         barmode="group"
     )
@@ -703,8 +703,8 @@ elif pagina == "Tabela Completa":
     "username": "Torre",
     "group_user": "PA",
     "nrserie": "Nr Série",
-    "estado": "Status_1",
-    "acao":"Status_2"
+    "estado": "Status-1",
+    "acao":"Status-2"
     }).drop(columns=["patrimonio"], errors="ignore")
 
 
