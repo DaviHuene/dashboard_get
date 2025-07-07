@@ -352,7 +352,7 @@ if pagina == "Dashboard":
         }
     )
 
-    fig.update_layout(
+    fig.update_layout(width=1000, height=400,
         yaxis_title="Percentual (%)",
         xaxis_tickangle=-45,
         plot_bgcolor='rgba(0,0,0,0)',
@@ -401,7 +401,7 @@ if pagina == "Dashboard":
 
         fig1.update_traces(marker_color="#c70101", textposition="inside", textfont_size=18)
 
-        fig1.update_layout(
+        fig1.update_layout(width=1000, height=400,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -463,7 +463,7 @@ if pagina == "Dashboard":
             trace.marker.color = custom_colors[estado_nome]
 
     # Layout visual
-    fig_estado.update_layout(
+    fig_estado.update_layout(width=1000, height=400,
          plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -530,7 +530,7 @@ if pagina == "Dashboard":
             trace.marker.color = custom_colors1[acao_nome]
 
     # 7. Layout visual
-    fig_acao.update_layout(
+    fig_acao.update_layout(width=1000, height=400,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color=cor_texto_menu),
@@ -568,7 +568,7 @@ if pagina == "Dashboard":
     fig2 = px.bar(df2, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
                 title="Torres diferente de fechado por PA", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
     fig2.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-    fig2.update_layout(
+    fig2.update_layout(width=1000, height=400,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -596,7 +596,7 @@ if pagina == "Dashboard":
     fig3 = px.bar(df3, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
                 title="Total de Seriais por PA e Torre (Fechados)", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
     fig3.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-    fig3.update_layout(
+    fig3.update_layout(width=1000, height=400,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -657,7 +657,7 @@ if pagina == "Dashboard":
 
     # 6. Estilização
     fig4.update_traces(textposition='inside', textfont_color='white', textfont_size=18)
-    fig4.update_layout(
+    fig4.update_layout(width=1000, height=400,
         font=dict(color=cor_texto_menu),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
@@ -679,7 +679,7 @@ if pagina == "Dashboard":
     fig_Invalidado = px.bar(df_Invalidado_agrupado, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
      title="Total de Seriais Invalidados por PA e Torre", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
     fig_Invalidado.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-    fig_Invalidado.update_layout(
+    fig_Invalidado.update_layout(width=1000, height=400,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
