@@ -214,7 +214,7 @@ df_filtrado = df[
 #
 
 if pagina == "Dashboard":
-   data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
+    data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
     st.markdown(f"""
            <div style="background:{cor_fundo};">
             <h3>🕒 Atualizado em: {data_atualizacao}</h3>
