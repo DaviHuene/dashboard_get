@@ -214,13 +214,7 @@ df_filtrado = df[
 #
 
 if pagina == "Dashboard":
-    data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    st.markdown(f"""
-           <div style="background:{cor_fundo};">
-            <h3>🕒 Atualizado em: {data_atualizacao}</h3>
-        </div>""",unsafe_allow_html=True)
-    st.title("Painel Analítico de Seriais Bipados")
-    
+   
     # Base completa sem filtro (para contagem real de lotes)
     df_lotes = df[["lote_id", "status_lote"]].drop_duplicates()
     df_lotes["status_lote"] = df_lotes["status_lote"].str.strip().str.lower()
