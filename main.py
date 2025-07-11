@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import requests
 from io import StringIO
-from datetime import time
+from datetime import datetime
 import plotly.graph_objects as go
 import time
 st.set_page_config(page_title="Painel Inventário", layout="wide")
@@ -214,7 +214,7 @@ df_filtrado = df[
 #
 
 if pagina == "Dashboard":
-    data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
+   data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
     st.markdown(f"""
            <div style="background:{cor_fundo};">
             <h3>🕒 Atualizado em: {data_atualizacao}</h3>
