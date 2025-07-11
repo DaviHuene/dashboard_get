@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import requests
 from io import StringIO
-from datetime import datetime
+from datetime import time
 import plotly.graph_objects as go
 import time
 st.set_page_config(page_title="Painel Inventário", layout="wide")
