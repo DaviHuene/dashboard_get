@@ -29,3 +29,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+else:
+    st.warning("⚠️ Coluna 'status' não encontrada para o gráfico de Status por Torre.")

@@ -2,7 +2,7 @@
 import requests
 import streamlit as st
 
-API_URL = "http://192.168.0.214/inventario-api/api/v1/dash"
+API_URL = "http://192.168.0.216/inventario-api/api/v1/dash/"
 
 @st.cache_data(ttl=300)
 def carregar_dados_api():

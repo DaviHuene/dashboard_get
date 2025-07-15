@@ -47,7 +47,7 @@ st.sidebar.title("Menu")
 pagina = st.sidebar.selectbox("Escolha a página", ["Dashboard", "Tabela Completa"])
     
 # 🔸 Dados da API
-API_URL = "http://192.168.0.214/inventario-api/api/v1/dash"
+API_URL = "http://192.168.0.216/inventario-api/api/v1/dash/"
 try:
     response = requests.get(API_URL, headers={"accept": "application/json"})
     response.raise_for_status()
