@@ -74,7 +74,7 @@ st.markdown(f"""
 
 pagina = st.sidebar.selectbox("Escolha a página", ["Dashboard", "Tabela Completa"])
 
-API_URL = "http://192.168.0.216/inventario-api/api/v1/dash/"
+API_URL = "https://www.centralretencao.com.br/inventario-api/api/v1/dash/"
 
 try:
     response = requests.get(API_URL, headers={"accept": "application/json"})
@@ -215,11 +215,7 @@ df_filtrado = df[
 #
 
 if pagina == "Dashboard":
-    data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    st.markdown(f"""
-           <div style="background:{cor_fundo};">
-            <h3>🕒 Atualizado em: {data_atualizacao}</h3>
-        </div>""",unsafe_allow_html=True)
+  
     st.title("Painel Analítico de Seriais Bipados")
     
     # Base completa sem filtro (para contagem real de lotes)
@@ -305,7 +301,8 @@ if pagina == "Dashboard":
     ]
     usuarios = sorted(df_filtrado["username"].dropna().unique())
     mapa_cores_username = {user: tons_vermelho[i % len(tons_vermelho)] for i, user in enumerate(usuarios)}
-    @st.cache_data(ttl=300)
+   
+    @st.cache_data(ttl=5000)
     def carregar_dados():
         response = requests.get(API_URL, headers={"accept": "application/json"})
         response.raise_for_status()
@@ -319,8 +316,7 @@ if pagina == "Dashboard":
             df_filtrado[["lote_id", "username", "group_user"]].drop_duplicates(),
             on="lote_id", how="left"
         )
-
-    # 📊 Filtrar os status desejados
+# 📊 Filtrar os status desejados
     df_status = df_lotes[df_lotes["status_lote"].isin(["fechado", "aberto", "invalidado"])]
 
     # 🔀 Criar coluna combinada: PA + Torre
@@ -353,7 +349,7 @@ if pagina == "Dashboard":
         }
     )
 
-    fig.update_layout(width=1000, height=400,
+    fig.update_layout(width=2300, height=1000,
         yaxis_title="Percentual (%)",
         xaxis_tickangle=-45,
         plot_bgcolor='rgba(0,0,0,0)',
@@ -364,7 +360,7 @@ if pagina == "Dashboard":
         yaxis=dict(color=cor_texto_menu, gridcolor="#444" if modo == "Escuro" else "#ccc")
     )
 
-    fig.update_traces(textposition="inside", textfont_size=18)
+    fig.update_traces(textposition="inside", textfont_size=200)
 
     # ▶️ Exibir no Streamlit
     st.plotly_chart(fig, use_container_width=True, config={
@@ -383,10 +379,8 @@ if pagina == "Dashboard":
         df_caixas = df_filtrado.drop_duplicates(subset=["caixa_id", "username", "group_user", "status_lote"])
 
         # ✅ Filtrar apenas caixas de lotes fechados
-        df_fechadas = df_caixas[df_caixas["status_lote"] == "fechado"]
-
-        # 🏷️ Criar coluna combinada "Torre - PA"
-        df_fechadas["torre_pa"] = df_fechadas["username"] + " - " + df_fechadas["group_user"]
+        df_fechadas = df_caixas[df_caixas["status_lote"] == "fechado"].copy()  # <- ESSENCIAL
+        df_fechadas.loc[:, "torre_pa"] = df_fechadas["username"] + " - " + df_fechadas["group_user"]
 
         # 🧮 Agrupar e contar caixas fechadas por Torre-PA
         df_caixas_fechadas = df_fechadas.groupby("torre_pa")["caixa_id"].nunique().reset_index(name="caixas_fechadas")
@@ -400,9 +394,9 @@ if pagina == "Dashboard":
         labels={"torre_pa": "Torre - PA", "caixas_fechadas": "Caixas Fechadas"}
     )
 
-        fig1.update_traces(marker_color="#c70101", textposition="inside", textfont_size=18)
+        fig1.update_traces(marker_color="#c70101", textposition="inside", textfont_size=200)
 
-        fig1.update_layout(width=1000, height=400,
+        fig1.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -419,8 +413,8 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-        fig1.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-        st.plotly_chart(fig1, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+        fig1.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+        st.plotly_chart(fig1,  use_container_width=True,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
     # Paleta em tons de vermelho para os estados
     custom_colors = {
@@ -464,7 +458,7 @@ if pagina == "Dashboard":
             trace.marker.color = custom_colors[estado_nome]
 
     # Layout visual
-    fig_estado.update_layout(width=1000, height=400,
+    fig_estado.update_layout(width=2000, height=1000,
          plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -481,7 +475,7 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-    fig_estado.update_traces(textposition='inside', textfont_color='white', textfont_size=18)
+    fig_estado.update_traces(textposition='inside', textfont_color='white', textfont_size=200)
    
     st.plotly_chart(
         fig_estado,
@@ -531,7 +525,7 @@ if pagina == "Dashboard":
             trace.marker.color = custom_colors1[acao_nome]
 
     # 7. Layout visual
-    fig_acao.update_layout(width=1000, height=400,
+    fig_acao.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color=cor_texto_menu),
@@ -552,7 +546,7 @@ if pagina == "Dashboard":
     fig_acao.update_traces(
         textposition='inside',
         textfont_color='white',
-        textfont_size=18
+        textfont_size=200
     )
 
     # 8. Exibir no Streamlit
@@ -568,8 +562,8 @@ if pagina == "Dashboard":
     df2 = df_abertos.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig2 = px.bar(df2, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
                 title="Torres diferente de fechado por PA", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
-    fig2.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-    fig2.update_layout(width=1000, height=400,
+    fig2.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+    fig2.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -587,7 +581,7 @@ if pagina == "Dashboard":
         )
     )
 
-    st.plotly_chart(fig2, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+    st.plotly_chart(fig2,  use_container_width=True,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
     # Gráfico 3 - Seriais por Torre (Fechados)
     df_fechado = df_filtrado[df_filtrado["status_lote"].str.lower() == "fechado"].copy()
@@ -596,8 +590,8 @@ if pagina == "Dashboard":
     df3 = df_fechado.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig3 = px.bar(df3, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
                 title="Total de Seriais por PA e Torre (Fechados)", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
-    fig3.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-    fig3.update_layout(width=1000, height=400,
+    fig3.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+    fig3.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -615,7 +609,7 @@ if pagina == "Dashboard":
         )
     )
 
-    st.plotly_chart(fig3, use_container_width=False)
+    st.plotly_chart(fig3,  use_container_width=True)
     
     # 1. Mapeamento de status (legível)
     mapa_status = {
@@ -657,8 +651,8 @@ if pagina == "Dashboard":
     )
 
     # 6. Estilização
-    fig4.update_traces(textposition='inside', textfont_color='white', textfont_size=18)
-    fig4.update_layout(width=1000, height=400,
+    fig4.update_traces(textposition='inside', textfont_color='white', textfont_size=200)
+    fig4.update_layout(width=2000, height=1000,
         font=dict(color=cor_texto_menu),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
@@ -679,8 +673,8 @@ if pagina == "Dashboard":
     df_Invalidado_agrupado = df_Invalidado.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig_Invalidado = px.bar(df_Invalidado_agrupado, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
      title="Total de Seriais Invalidados por PA e Torre", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
-    fig_Invalidado.update_traces(textposition='inside', textfont_color='white',textfont_size=18)
-    fig_Invalidado.update_layout(width=1000, height=400,
+    fig_Invalidado.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+    fig_Invalidado.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
         font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
@@ -692,85 +686,12 @@ if pagina == "Dashboard":
         )
     )
 
-    st.plotly_chart(fig_Invalidado, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
+    st.plotly_chart(fig_Invalidado,  use_container_width=True,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
-    # Gráfico de Pizza
-    col_p1, col_p2 = st.columns(2)
-    df_pizza = df_filtrado.groupby("username").size().reset_index(name="total_seriais")
-    df_pizza_group = df_filtrado.groupby(["group_user", "username"]).size().reset_index(name="total_seriais")
-
-    # Preencher com valores fictícios se estiver vazio
-    if df_pizza.empty:
-        df_pizza = pd.DataFrame({
-            "username": ["Sem Dados"],
-            "total_seriais": [1]
-            
-        })
-
-    if df_pizza_group.empty:
-        df_pizza_group = pd.DataFrame({
-            "group_user": ["Sem Dados"],
-            "username": ["Sem Dados"],
-            "total_seriais": [1]
-        })
-
-    with col_p1:
-        fig_pizza = px.pie(
-        df_pizza, names="username", values="total_seriais",
-            title="Seriais por Torre (Total)", hole=0.3,
-            color="username", color_discrete_map=mapa_cores_username,
-            labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status", "username": "Torre"})
-        fig_pizza.update_traces(textinfo='percent+label')
-        fig_pizza.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=18), legend_title="Status")
-        fig_pizza.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
-        paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
-        font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
-        legend=dict(font=dict(color=cor_texto_menu)),  # legenda
-        xaxis=dict(
-            color=cor_texto_menu,
-            showgrid=False,
-            zeroline=False
-        ),
-        yaxis=dict(
-            color=cor_texto_menu,
-            showgrid=True,
-            gridcolor="#444" if modo == "Escuro" else "#ccc",
-            zeroline=False
-        )
-    )
-        st.plotly_chart(fig_pizza, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
-        
-    with col_p2:
-        fig_pizza2 = px.sunburst(
-        df_pizza_group, path=["group_user", "username"], values="total_seriais",
-        title="Distribuição de Seriais por PA e Torre",
-        color="username", color_discrete_map=mapa_cores_username,
-        labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status", "username": "Torre"})
-        fig_pizza2.update_layout(width=1000, height=400, xaxis_tickfont=dict(size=18), legend_title="Status")
-        fig_pizza2.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
-        paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
-        font=dict(color=cor_texto_menu),    # cor dos textos do gráfico
-        legend=dict(font=dict(color=cor_texto_menu)),  # legenda
-        xaxis=dict(
-            color=cor_texto_menu,
-            showgrid=False,
-            zeroline=False
-        ),
-        yaxis=dict(
-            color=cor_texto_menu,
-            showgrid=True,
-            gridcolor="#444" if modo == "Escuro" else "#ccc",
-            zeroline=False
-        )
-    )   
-        fig_pizza2.update_traces(marker=dict(colors=tons_vermelho))  # força o uso do seu mapa
-        st.plotly_chart(fig_pizza2, use_container_width=False,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
-
+  
 elif pagina == "Tabela Completa":
     # CSS para ocultar índice e scroll lateral
-    
+    df_sem_primeira = df.iloc[:, 0:]
     # Garante nomes amigáveis na tabela
 
     # ✅ Prepara os dados (renomeia colunas e remove 'patrimonio')

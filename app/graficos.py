@@ -9,7 +9,7 @@ def titulo_dashboard(df_filtrado, modo, cor_fundo, cor_texto_menu):
 
 def exibir_data_atualizacao(cor_fundo):
     data_atualizacao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    st.markdown(f"<div style='background:{cor_fundo};'><h3>🕒 Atualizado em: {data_atualizacao}</h3></div>", unsafe_allow_html=True)
+   
 
 def exibir_indicadores(df, df_filtrado, modo, cor_fundo, cor_primaria, cor_texto_menu):
     tons_vermelho = ["#c70303", "#9b0000", "#c23737", "#d14a4a", "#d80202", "#ef9a9a", "#f44336",
