@@ -360,7 +360,7 @@ if pagina == "Dashboard":
         yaxis=dict(color=cor_texto_menu, gridcolor="#444" if modo == "Escuro" else "#ccc")
     )
 
-    fig.update_traces(textposition="inside", textfont_size=200)
+    fig.update_traces(textposition="inside", textfont_size=2500)
 
     # ▶️ Exibir no Streamlit
     st.plotly_chart(fig, use_container_width=True, config={
@@ -394,7 +394,7 @@ if pagina == "Dashboard":
         labels={"torre_pa": "Torre - PA", "caixas_fechadas": "Caixas Fechadas"}
     )
 
-        fig1.update_traces(marker_color="#c70101", textposition="inside", textfont_size=200)
+        fig1.update_traces(marker_color="#c70101", textposition="inside", textfont_size=2500)
 
         fig1.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
@@ -413,7 +413,7 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-        fig1.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+        fig1.update_traces(textposition='inside', textfont_color='white',textfont_size=2500)
         st.plotly_chart(fig1,  use_container_width=True,config={"displaylogo": False, "modeBarButtonsToRemove": ["toggleFullscreen"]})
 
     # Paleta em tons de vermelho para os estados
@@ -475,7 +475,7 @@ if pagina == "Dashboard":
             zeroline=False
         )
     )
-    fig_estado.update_traces(textposition='inside', textfont_color='white', textfont_size=200)
+    fig_estado.update_traces(textposition='inside', textfont_color='white', textfont_size=2500)
    
     st.plotly_chart(
         fig_estado,
@@ -546,7 +546,7 @@ if pagina == "Dashboard":
     fig_acao.update_traces(
         textposition='inside',
         textfont_color='white',
-        textfont_size=200
+        textfont_size=2500
     )
 
     # 8. Exibir no Streamlit
@@ -562,7 +562,7 @@ if pagina == "Dashboard":
     df2 = df_abertos.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig2 = px.bar(df2, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
                 title="Torres diferente de fechado por PA", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
-    fig2.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+    fig2.update_traces(textposition='inside', textfont_color='white',textfont_size=2500)
     fig2.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
@@ -590,7 +590,7 @@ if pagina == "Dashboard":
     df3 = df_fechado.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig3 = px.bar(df3, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
                 title="Total de Seriais por PA e Torre (Fechados)", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
-    fig3.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+    fig3.update_traces(textposition='inside', textfont_color='white',textfont_size=2500)
     fig3.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
@@ -651,7 +651,7 @@ if pagina == "Dashboard":
     )
 
     # 6. Estilização
-    fig4.update_traces(textposition='inside', textfont_color='white', textfont_size=200)
+    fig4.update_traces(textposition='inside', textfont_color='white', textfont_size=2500)
     fig4.update_layout(width=2000, height=1000,
         font=dict(color=cor_texto_menu),
         plot_bgcolor='rgba(0,0,0,0)',
@@ -673,7 +673,7 @@ if pagina == "Dashboard":
     df_Invalidado_agrupado = df_Invalidado.groupby(["group_user", "username"]).size().reset_index(name="quantidade")
     fig_Invalidado = px.bar(df_Invalidado_agrupado, x="group_user", y="quantidade", color="username", barmode="group",text='quantidade',
      title="Total de Seriais Invalidados por PA e Torre", color_discrete_map=mapa_cores_username,labels={"group_user": "PA", "total_seriais": "Total de Seriais", "status_lote_label": "Status","username":"Torre"})
-    fig_Invalidado.update_traces(textposition='inside', textfont_color='white',textfont_size=200)
+    fig_Invalidado.update_traces(textposition='inside', textfont_color='white',textfont_size=2500)
     fig_Invalidado.update_layout(width=2000, height=1000,
         plot_bgcolor='rgba(0,0,0,0)',        # fundo do gráfico
         paper_bgcolor='rgba(0,0,0,0)',       # fundo da área externa
