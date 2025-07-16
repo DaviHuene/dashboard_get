@@ -316,57 +316,6 @@ if pagina == "Dashboard":
             df_filtrado[["lote_id", "username", "group_user"]].drop_duplicates(),
             on="lote_id", how="left"
         )
-# 📊 Filtrar os status desejados
-    df_status = df_lotes[df_lotes["status_lote"].isin(["fechado", "aberto", "invalidado"])]
-
-    # 🔀 Criar coluna combinada: PA + Torre
-    df_status["torre_pa"] = df_status["group_user"] + " - " + df_status["username"]
-
-    # 🧮 Agrupar por torre_pa e status
-    df_agrupado = df_status.groupby(["torre_pa", "status_lote"]).size().reset_index(name="quantidade")
-    df_totais = df_status.groupby("torre_pa").size().reset_index(name="total_lotes")
-
-    # ➗ Calcular percentual
-    df_percentual = pd.merge(df_agrupado, df_totais, on="torre_pa")
-    df_percentual["percentual"] = round((df_percentual["quantidade"] / df_percentual["total_lotes"]) * 100, 2)
-    df_percentual["status_lote"] = df_percentual["status_lote"].str.capitalize()
-
-        # ✅ Formatar percentual com símbolo %
-    df_percentual["percentual"] = df_percentual["percentual"].astype(str) + "%"
-    fig = px.bar(
-        df_percentual,
-        x="torre_pa",
-        y="percentual",
-        color="status_lote",
-        text="percentual",
-        barmode="stack",
-        title=" Percentual de Lotes por Status, Torre e PA",
-        labels={"torre_pa": "Torre - PA", "percentual": "%", "status_lote": "Status"},
-        color_discrete_map={
-            "Fechado": "#dd1d1d",
-            "Aberto": "#7a0101",
-            "Invalidado": "#4b0b04"
-        }
-    )
-
-    fig.update_layout(width=2300, height=1000,
-        yaxis_title="Percentual (%)",
-        xaxis_tickangle=-45,
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color=cor_texto_menu),
-        legend=dict(font=dict(color=cor_texto_menu)),
-        xaxis=dict(color=cor_texto_menu),
-        yaxis=dict(color=cor_texto_menu, gridcolor="#444" if modo == "Escuro" else "#ccc")
-    )
-
-    fig.update_traces(textposition="inside", textfont_size=2500)
-
-    # ▶️ Exibir no Streamlit
-    st.plotly_chart(fig, use_container_width=True, config={
-        "displaylogo": False,
-        "modeBarButtonsToRemove": ["toggleFullscreen"]
-    })
 
         # 📦 Garantir colunas necessárias
     colunas_necessarias = ["caixa_id", "username", "group_user", "status_lote"]
