@@ -74,7 +74,7 @@ st.markdown(f"""
 
 pagina = st.sidebar.selectbox("Escolha a página", ["Dashboard", "Tabela Completa"])
 
-API_URL = "https://www.centralretencao.com.br/inventario-api/api/v1/dash/"
+API_URL = "https://www.centralretencao.com.br/inventario-api/api/v1/dash/cache/"
 
 try:
     response = requests.get(API_URL, headers={"accept": "application/json"})
