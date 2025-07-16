@@ -64,9 +64,9 @@ def obter_resumo(pa=None):
     try:
         # Se o filtro de PA for fornecido, adicionamos o parâmetro na URL
         if pa:
-            response = requests.get(f"https://www.centralretencao.com.br/inventario-api/api/v1/dash/resumo?pa={pa}")
+            response = requests.get(f"https://www.centralretencao.com.br/inventario-api/api/v1/dash/painel/resumo?pa={pa}")
         else:
-            response = requests.get("https://www.centralretencao.com.br/inventario-api/api/v1/dash/resumo")
+            response = requests.get("https://www.centralretencao.com.br/inventario-api/api/v1/dash/painel/resumo")
         
         response.raise_for_status()  # Verifica se a requisição foi bem-sucedida
         return response.json()  # Retorna os dados como um dicionário
