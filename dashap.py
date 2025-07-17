@@ -252,25 +252,3 @@ if dados_resumo:
 
 else:
     st.warning("⚠️ Não foi possível carregar os dados do painel.")
-# API para obter os lotes
-# API para obter os lotes
-API_URL2 = "http://192.168.0.216/inventario-api/api/v1/dash/cache/"
-
-# ⚠️ Verificação se nenhum PA foi selecionado
-if not filtro_pa:
-    st.warning("⚠️ Nenhum PA selecionado. Selecione pelo menos um para continuar.")
-    st.stop()
-
-try:
-    response = requests.get(API_URL2, headers={"accept": "application/json"})
-    response.raise_for_status()
-    data = response.json()
-
-    # Verifica se existe pelo menos um 'status_lote' nos lotes
-    if not any("status" in lote for lote in data):
-        st.error("⚠️ Nenhum lote encontrado.")
-        st.stop()
-
-except Exception:
-    st.error("⚠️ Nenhum dado foi carregado. A API pode estar fora do ar ou sem dados disponíveis.")
-    st.stop()
